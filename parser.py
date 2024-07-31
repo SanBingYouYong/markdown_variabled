@@ -16,13 +16,14 @@ import os
 
 ### HELPERS ###
 class MarkdownParser():
-    def __init__(self, verbose: bool=False) -> None:
+    def __init__(self, verbose: bool=False, encoding: str='utf-8') -> None:
         self.variables = {}
         self.raw_expressions = {}
         self.markdown_lines = []
         self.parsed_lines = []
 
         self.verbose = verbose
+        self.encoding = encoding
     
     @staticmethod
     def is_definition_line(line: str):
@@ -135,14 +136,13 @@ class MarkdownParser():
         else:
             self.parse_text_line(line)
             
-    def parse(self, md_filepath: str, output_filepath: str, 
-              encoding: str='utf-8'):
+    def parse(self, md_filepath: str, output_filepath: str):
         '''
         Reads the markdown file, parses the content line-by-line, and writes to the output file, creating the output directory if necessary.
         '''
         if not os.path.exists(md_filepath):
             raise FileNotFoundError(f"File not found: {md_filepath}")
-        with open(md_filepath, "r") as f:
+        with open(md_filepath, "r", encoding=self.encoding) as f:
             self.markdown_lines = f.readlines()
         for line in self.markdown_lines:
             self.interpret_line(line)
@@ -154,7 +154,7 @@ class MarkdownParser():
             if self.verbose:
                 print(f"Creating output directory: {output_dir} for the output file: {output_filepath}")
             os.makedirs(output_dir)
-        with open(output_filepath, 'w', encoding=encoding) as file:
+        with open(output_filepath, 'w', encoding=self.encoding) as file:
             file.write(''.join(self.parsed_lines))
         print(f"Formatted content saved to {output_filepath}")
         
@@ -182,6 +182,6 @@ if __name__ == "__main__":
     if _forced_output_path is not None and _output_suffix != 'parsed':
         print("Warning: Ignoring output suffix as forced output path is provided")
     # Instantiate the parser
-    parser = MarkdownParser(verbose=verbose)
+    parser = MarkdownParser(verbose=verbose, encoding=encoding)
     # Parse the markdown file
-    parser.parse(md_path, output_path, encoding)
+    parser.parse(md_path, output_path)

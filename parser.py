@@ -5,8 +5,8 @@ parser = argparse.ArgumentParser(description='Markdown Parser')
 
 # Add arguments
 parser.add_argument('md_path', type=str, help='Path to the markdown file')
-parser.add_argument('--output_suffix', type=str, default='parsed', help='Suffix for the output file')
-parser.add_argument('--forced_output_path', type=str, help='Path to the forced output file')
+parser.add_argument('--output_suffix', '-s', type=str, default='parsed', help='Suffix for the output file')
+parser.add_argument('--forced_output_path', '-f',  type=str, help='Path to the forced output file')
 
 # Parse the arguments
 args = parser.parse_args()
@@ -39,12 +39,6 @@ def parse_strings_to_vars(strings):
         key, value = string[1:].split('=')
         key = key.strip()
         value = value.strip()
-        
-        # Check if the value is a number or a string
-        if value.isdigit():
-            value = int(value)
-        else:
-            value = value.strip('"')
         
         # Assign the value to the key in the variables dictionary
         variables[key] = value

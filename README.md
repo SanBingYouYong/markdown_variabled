@@ -1,6 +1,6 @@
 # Markdown Variabled
 Custom markdown parser/syntax for inserting variables like Python format strings. 
-
+![intro](md_parser.png)
 # Quick Start
 ## Syntax
  - use the following grammar to define variables on separate new lines:

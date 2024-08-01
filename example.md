@@ -13,9 +13,9 @@ In Python, a variable like year={year} will be treated as a {type(year)}.
 
 ### Dynamic Evaluation of @variables
 @pic="intro.png"
+@show_pic=True
 ~pic_command=f"![pic]({pic})" if show_pic else "No Pic For You!"
 
-@show_pic=True
 Do we have a picture? Yes! 
  - {pic_command}
 
@@ -30,10 +30,20 @@ book name formated: {format_book_name(book)}
 ~multiple_arg_func=lambda name, year: '《' + str(name) + "》" + " in year " + str(year)
 multiple args: {multiple_arg_func(book, year)}
 
-### Nested Expression is not supported right now
-@nested0=not supported
-~nested=nested0 + book
-nested: {nested}
+### Nested Expression Support
+@nested=nested
+~nested1=nested + "1"
+~nested2=nested1 + "2"
+Nested expressions are now supported: 
+ - nested: {nested}, nested1: {nested1}, nested2: {nested2}
+@nested=really dynamic
+And they are also dynamic: 
+ - nested: {nested}, nested1: {nested1}, nested2: {nested2}
+~nested1=nested + "?"
+~nested2=nested1 + "!!"
+ - nested: {nested}, nested1: {nested1}, nested2: {nested2}
+
+
 
 /### Still Want {}?
  - Escape the line

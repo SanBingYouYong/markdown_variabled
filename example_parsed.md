@@ -19,8 +19,14 @@ book name formated: 《Two Years of My Life》
 
 multiple args: 《Two Years of My Life》 in year 2000
 
-### Nested Expression is not supported right now
-nested: not supportedTwo Years of My Life
+### Nested Expression Support
+Nested expressions are now supported: 
+ - nested: nested, nested1: nested1, nested2: nested12
+And they are also dynamic: 
+ - nested: really dynamic, nested1: really dynamic1, nested2: really dynamic12
+ - nested: really dynamic, nested1: really dynamic?, nested2: really dynamic?!!
+
+
 
 ### Still Want {}?
  - Escape the line

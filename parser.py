@@ -12,21 +12,23 @@ Upon running the script, the variables will be parsed and formatted into the mar
 
 import argparse
 import os
+from typing import Any
 
 
 ### HELPERS ###
 class MarkdownParser():
     def __init__(self, verbose: bool=False, encoding: str='utf-8') -> None:
-        self.variables = {}
+        self.current_state = {}
+
         self.raw_expressions = {}
         self.markdown_lines = []
         self.parsed_lines = []
 
-        self.verbose = verbose
-        self.encoding = encoding
+        self.verbose: bool = verbose
+        self.encoding: str = encoding
     
     @staticmethod
-    def is_definition_line(line: str):
+    def is_definition_line(line: str) -> bool:
         '''
         Identify a definition line with @/~ prefix and = in it
         '''
@@ -36,7 +38,7 @@ class MarkdownParser():
         return has_prefix and has_equals and not_del_line
     
     @staticmethod
-    def parse_value(value: str):
+    def parse_value(value: str) -> Any:
         '''
         Parse a variable into correct type: int/float/bool/str, default (last) str
         '''
@@ -59,70 +61,74 @@ class MarkdownParser():
             return value[1:-1]
         return value  # default to string
 
-    def parse_definition_line(self, line: str):
+    def parse_definition_line(self, line: str) -> None:
         '''
         Parse a definition line: 
              - if it's a variable definition (@), 
-             parse and store it, or update it if exists (just dict anyways)
+             parse and update current_state
              - if it's an expression definition (~), 
-             store it as raw expression and evaluate it later (supports dynamic variables)
+             store it as raw expression for evaluation it later (when a textline is encountered, all expressions are evaluated)
         
-        When same name is used to define the other type of var, 
-            it will overwrite the previous definition, 
+        When same name is used, old definition will be overwritten:
             meaning that the previous definition will be lost. 
+                 - e.g. naming a var(@) with an expr(~)'s name will delete the expr from raw_expressions
+                 - e.g. naming an expr(~) with a repeated name(@/~) will update the expr in raw_expressions
+                    and remove the previous value from current_state, be it defined by @ or evaluated from raw_expressions.
+        
+        When an expression self-referencing, e.g. ~x = x, it will be treated as string "x" and NOT added to raw_expressions. 
         '''
         if line.startswith("@"):
             key, value = line[1:].split("=")
             key = key.strip()
-            if key in self.raw_expressions:
-                if self.verbose:
-                    print(f"Warning: Expression {key} already defined as expression, overwriting as variable")
-                del self.raw_expressions[key]
             value = MarkdownParser.parse_value(value.strip())
-            self.variables[key] = value
+            if key in self.raw_expressions:  # overwrite the expr with var
+                if self.verbose:
+                    print(f"Warning: {key} already defined, previous definition in raw_expressions as {self.raw_expressions[key]} will be overwritten by: {value}.")
+                del self.raw_expressions[key]  # removed from raw_expressions
+            self.current_state[key] = value  # maybe can remove variables now if directly added
         elif line.startswith("~"):
             key, expression = line[1:].split("=")
             key = key.strip()
-            if key in self.variables:
-                if self.verbose:
-                    print(f"Warning: Variable {key} already defined, overwriting as expression")
-                del self.variables[key]
             expression = expression.strip()
-            self.raw_expressions[key] = expression
+            if key in self.current_state:  # overwrite (deletes and wait to be eval'd) previous var or eval'd expr
+                if self.verbose:
+                    print(f"Warning: {key} already defined, previous definition in current_stateas {self.current_state[key]} will be removed and {expression} will be added to raw_expressions.")
+                del self.current_state[key]  # deletes previous var/eval'd expr from current_state
+            # avoid x = x, treat as x = "x"
+            if key == expression:
+                if self.verbose:
+                    print(f"Warning: Expression {key} is self-referencing, treating as string and not recording as expression")
+                self.current_state[key] = expression
+            else:
+                self.raw_expressions[key] = expression
 
     @staticmethod
-    def eval_f_string(s, vars_dict):
-        return eval(f"f'''{s}'''", {}, vars_dict)
+    def eval_f_string(s, vars_dict) -> str:
+        return eval(f"f'''{s}'''", {}, vars_dict)  # eval as f string (expression wrapped in f string)
     
-    def evaluate_expressions(self):
+    def eval_expressions_and_update_state(self) -> None:
         '''
-        Evaluate the raw expressions using the current variables
+        Evaluate the raw expressions using the current state, and update the current state
         '''
-        cur_exprs = {}
         for key, expression in self.raw_expressions.items():
-            try:  # now it only matches things in variables, so no nested expressions
-                value = eval(expression, {}, self.variables)
+            try:
+                # eval an expression directly
+                value = eval(expression, {}, self.current_state)
             except Exception as e:
                 if verbose:
                     print(f"Error evaluating expression for {key}: {e}")
                     print(f"Falling back to treat expression as string")
                 value = expression
-            cur_exprs[key] = value
-        return cur_exprs
+            # update current state immediately
+            self.current_state[key] = value
     
-    def get_current_state(self):
-        '''
-        Get the current state of variables and evaluated expressions
-        '''
-        cur_vars = self.variables.copy()
-        cur_exprs = self.evaluate_expressions()
-        cur_vars.update(cur_exprs)
-        return cur_vars
-    
-    def parse_text_line(self, line: str):
+    def parse_text_line(self, line: str) -> None:
         '''
         Parse a text line by formatting it with the current state of variables and expressions, 
-        and append it to the parsed lines
+        and append it to self.parsed_lines. 
+        
+        If the line contains references to variable/expressions ({}s), 
+            it triggers an update of the current state by evaluating the raw expressions using the current current_state.
         '''
         # early termination
         if line == '\n':  # emtpy new line
@@ -134,20 +140,20 @@ class MarkdownParser():
         if line.startswith("/"):  # disable parsing for this line (if {} is needed as a text symbol instead)
             self.parsed_lines.append(line[1:])
             return
-        cur_vars = self.get_current_state()  # may still falsely try parse plain text
-        formatted_line = MarkdownParser.eval_f_string(line, cur_vars)
+        self.eval_expressions_and_update_state()
+        formatted_line = MarkdownParser.eval_f_string(line, self.current_state)
         self.parsed_lines.append(formatted_line)
 
-    def interpret_line(self, line: str):
+    def interpret_line(self, line: str) -> None:
         '''
-        Interpret a line. 
+        Interpret a line, be it definition (@/~) or text line, and parse accordingly.
         '''
         if MarkdownParser.is_definition_line(line):
             self.parse_definition_line(line)
         else:
             self.parse_text_line(line)
             
-    def parse(self, md_filepath: str, output_filepath: str):
+    def parse(self, md_filepath: str, output_filepath: str) -> None:
         '''
         Reads the markdown file, parses the content line-by-line, and writes to the output file, creating the output directory if necessary.
         '''

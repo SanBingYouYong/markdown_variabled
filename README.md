@@ -10,7 +10,7 @@ You'll only need `parser.py` file.
  - use the following grammar to define variables on individual new lines:
       - `@var=value` for direct Python variables
       - `~var=expression` for Python expression that will be evaluated upon parsing the line
-         - you may use other defined variables in the expression
+         - you may use other defined variables and expressions in the expression
  - reference your variables in text with brackets {}, just like you'd use an f string in python (`f"the variable is {var}"`):
      - "...`the variable is {var}`..."
          - it can also be an expression (like can be defined above): "...`the variable squared is {var * var}`..."
@@ -59,6 +59,7 @@ Using `pyinstaller`:
  - be able to import a definitions file
      - pythonic way of re-using templates lol
  - support nested expressions? 
+     - NOW SUPPORTED! 
  - built-in variables? 
      - I feel like this is begining to act like LaTex
      - with the potential import functionality, you may do it yourself

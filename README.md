@@ -38,6 +38,14 @@ You'll only need `parser.py` file.
      - **don't run the parser on random markdown files people send you** (lol)
          - ~~I mean why don't they run it themselves and send you the parsed version~~
 
+# Packing into Executable Binary
+Using `pyinstaller`: 
+ - `pip install pyinstaller`
+ - `pyinstaller --onefile parser.py`
+ - and theoretically you will receive a binary executable on your platform (win, linux, or mac)
+     - so you can do `parser.exe <markdown file>` directly
+ - an executable binary on Windows (tested on win11) is available and included in the release
+
 # Future Plans
  - maybe a website can be set-up too in the near future. no promises.
  - maybe also available as a PyPI/Conda package, but meh

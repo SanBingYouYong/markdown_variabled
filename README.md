@@ -42,7 +42,7 @@ You'll only need `parser.py` file.
 Using `pyinstaller`: 
  - `pip install pyinstaller`
  - `pyinstaller --onefile parser.py`
- - and theoretically you will receive a binary executable on your platform (win, linux, or mac)
+ - and theoretically you will receive a binary executable on your platform (win, linux, or mac) in `./dist/parser(.exe or whatever)`
      - so you can do `parser.exe <markdown file>` directly
  - an executable binary on Windows (tested on win11) is available and included in the release
 

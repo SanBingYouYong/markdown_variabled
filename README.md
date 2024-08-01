@@ -52,6 +52,7 @@ Using `pyinstaller`:
 
 # Future Plans
  - maybe a website can be set-up too in the near future. no promises.
+     - considering the use of `eval`s, might actually not lol. 
  - maybe also available as a PyPI/Conda package, but meh
  - ~~anti-fraud!~~
  - maybe pack a binary or a GUI

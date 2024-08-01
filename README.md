@@ -5,6 +5,7 @@ Now supports expressions parsed line-by-line so you can literally do fancy thing
 ![fancy](fancy.png)
 # Quick Start
 You'll only need `parser.py` file. 
+ - (or the packed binary file `parser.exe`, `parser.app` or `parser`, only `parser.exe` is available in the release currently)
 ## Syntax
  - use the following grammar to define variables on individual new lines:
       - `@var=value` for direct Python variables
@@ -18,6 +19,7 @@ You'll only need `parser.py` file.
 ## Usage
  - use `python parser.py <markdown file>` on your markdown with above grammar and you get a brand new parsed markdown file `<original_name>_parsed.md` in the same directory by default.
      - check out more options with `python parser.py -h`
+     - for the binary, just go with `parser.exe <markdown file>` or replace parser.exe with your binary file's name
 ## Tips
  - default encoding is utf-8, so multi-lang is supported
      - so if you Python version is high enough, you can do `@开始年份=2018` and `在{开始年份}年时`
@@ -29,7 +31,7 @@ You'll only need `parser.py` file.
      - ~~thanks to Python's strip method~~
 - you can even define **functions** using lambda: ~~this is too evil~~
      - e.g. `~format_year=lambda x : str(x) + "年"` and then `{format_year(year)}`
-         - sadly you can't use other variables within the lambda function, so you have to pass them in as a parameter (e.g. `lambda x, y: ...`)
+         - sadly you can't use other variables within the lambda function (not added to `globals()`, eventually I might as well?), so you have to pass them in as a parameter (e.g. `lambda x, y: ...`)
          - i.e. `~format_year=lambda x, pre: pre + str(x) + "年"` and `{format_year(year, prefix)}`
 ### Traps!
 - if you want to combine string and some logic code in an expression, make sure you properly surround the strings with quotes, single or double
@@ -60,3 +62,4 @@ Using `pyinstaller`:
  - built-in variables? 
      - I feel like this is begining to act like LaTex
      - with the potential import functionality, you may do it yourself
+ - add variables to `globals()` so we can reference other variables in lambda functions

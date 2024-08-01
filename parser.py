@@ -32,7 +32,8 @@ class MarkdownParser():
         '''
         has_prefix = line.startswith("@") or line.startswith("~")
         has_equals = "=" in line
-        return has_prefix and has_equals
+        not_del_line = not line.startswith("~~")  # not a deletion line
+        return has_prefix and has_equals and not_del_line
     
     @staticmethod
     def parse_value(value: str):
@@ -99,7 +100,7 @@ class MarkdownParser():
         '''
         cur_exprs = {}
         for key, expression in self.raw_expressions.items():
-            try:
+            try:  # now it only matches things in variables, so no nested expressions
                 value = eval(expression, {}, self.variables)
             except Exception as e:
                 if verbose:
@@ -123,7 +124,17 @@ class MarkdownParser():
         Parse a text line by formatting it with the current state of variables and expressions, 
         and append it to the parsed lines
         '''
-        cur_vars = self.get_current_state()
+        # early termination
+        if line == '\n':  # emtpy new line
+            self.parsed_lines.append(line)
+            return
+        if '{' not in line and '}' not in line:  # no variables or expressions
+            self.parsed_lines.append(line)
+            return
+        if line.startswith("/"):  # disable parsing for this line (if {} is needed as a text symbol instead)
+            self.parsed_lines.append(line[1:])
+            return
+        cur_vars = self.get_current_state()  # may still falsely try parse plain text
         formatted_line = MarkdownParser.eval_f_string(line, cur_vars)
         self.parsed_lines.append(formatted_line)
 

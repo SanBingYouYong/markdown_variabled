@@ -9,9 +9,11 @@ You'll only need `parser.py` file.
  - use the following grammar to define variables on individual new lines:
       - `@var=value` for direct Python variables
       - `~var=expression` for Python expression that will be evaluated upon parsing the line
+         - you may use other defined variables in the expression
  - reference your variables in text with brackets {}, just like you'd use an f string in python (`f"the variable is {var}"`):
-     - `the variable is {var}`
-         - it can also be an expression (like can be defined above): `the variable is {var * var}
+     - "...`the variable is {var}`..."
+         - it can also be an expression (like can be defined above): "...`the variable squared is {var * var}`..."
+ - append `/` to the start of a text line if you want to "escape" the line and use the actual brackets
  - check `example.md` and `example_parsed.md` for more details. 
 ## Usage
  - use `python parser.py <markdown file>` on your markdown with above grammar and you get a brand new parsed markdown file `<original_name>_parsed.md` in the same directory by default.
@@ -52,3 +54,9 @@ Using `pyinstaller`:
  - ~~anti-fraud!~~
  - maybe pack a binary or a GUI
      - this is actually more reasonable?
+ - be able to import a definitions file
+     - pythonic way of re-using templates lol
+ - support nested expressions? 
+ - built-in variables? 
+     - I feel like this is begining to act like LaTex
+     - with the potential import functionality, you may do it yourself

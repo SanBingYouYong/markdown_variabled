@@ -19,6 +19,10 @@ book name formated: 《Two Years of My Life》
 
 multiple args: 《Two Years of My Life》 in year 2000
 
+func with vars: Two Years of My Life book Two Years of My Life
+
+func with ref: 111Two Years of My Life
+
 ### Nested Expression Support
 Nested expressions are now supported: 
  - nested: nested, nested1: nested1, nested2: nested12

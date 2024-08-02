@@ -31,8 +31,9 @@ You'll only need `parser.py` file.
      - ~~thanks to Python's strip method~~
 - you can even define **functions** using lambda: ~~this is too evil~~
      - e.g. `~format_year=lambda x : str(x) + "年"` and then `{format_year(year)}`
-         - sadly you can't use other variables within the lambda function (not added to `globals()`, eventually I might as well?), so you have to pass them in as a parameter (e.g. `lambda x, y: ...`)
-         - i.e. `~format_year=lambda x, pre: pre + str(x) + "年"` and `{format_year(year, prefix)}`
+         - to use other variables, you can either pass them in as a parameter (e.g. `lambda x,y: ...`), or you can use a complicated syntax: `"{var}"`, for example: 
+             - `~func=lambda x: str(x) + "{var}"`
+             - because for lambda functions to work properly, they are first interpreted as a normal string so that the variables in `{}` get expanded, then they get evaluated as a lambda expression - therefore you need to wrap your variables with `""` to make sure the expanded definition is still grammarly correct. 
 ### Traps!
 - if you want to combine string and some logic code in an expression, make sure you properly surround the strings with quotes, single or double
     - otherwise it's an invalid Python expression

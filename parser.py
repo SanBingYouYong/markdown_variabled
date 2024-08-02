@@ -112,11 +112,17 @@ class MarkdownParser():
         '''
         for key, expression in self.raw_expressions.items():
             try:
-                # eval an expression directly
-                value = eval(expression, {}, self.current_state)
+                if "lambda" in expression:
+                    # evaluate other variables in the string first
+                    evaled_lambda_expr = MarkdownParser.eval_f_string(expression, self.current_state)
+                    # then evaluate the expanded string as a lambda expression
+                    value = eval(evaled_lambda_expr, {}, self.current_state)
+                else:
+                    # eval an expression directly
+                    value = eval(expression, {}, self.current_state)
             except Exception as e:
                 if verbose:
-                    print(f"Error evaluating expression for {key}: {e}")
+                    print(f"Error evaluating expression for {key}: {e} in {expression}")
                     print(f"Falling back to treat expression as string")
                 value = expression
             # update current state immediately

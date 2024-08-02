@@ -30,6 +30,14 @@ book name formated: {format_book_name(book)}
 ~multiple_arg_func=lambda name, year: '《' + str(name) + "》" + " in year " + str(year)
 multiple args: {multiple_arg_func(book, year)}
 
+~x=book
+~this_is_a_func=f"{x} {y} {book}"
+@y=book
+func with vars: {this_is_a_func}
+
+~func_with_ref=lambda z: str(z) + "{book}"
+func with ref: {func_with_ref(111)}
+
 ### Nested Expression Support
 @nested=nested
 ~nested1=nested + "1"

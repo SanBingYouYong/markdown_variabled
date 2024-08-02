@@ -67,3 +67,5 @@ Using `pyinstaller`:
      - I feel like this is begining to act like LaTex
      - with the potential import functionality, you may do it yourself
  - add variables to `globals()` so we can reference other variables in lambda functions
+     - instead, you may do it now, see Tips section
+     - and globals() did not work that smoothly
